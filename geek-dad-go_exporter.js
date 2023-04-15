@@ -5,6 +5,7 @@
 // @version      1.0
 // @description  Export links of photos/videos along with there metadata into a CSV file. Once you have the links, you can use your preferred tool to download the photos and videos.
 // @author       everbird
+// @downloadURL  https://raw.githubusercontent.com/everbird/geekdadgo/main/geek-dad-go_exporter.js
 // @include      https://schools.procareconnect.com/*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // @grant        none
