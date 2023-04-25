@@ -23,7 +23,7 @@ ABBR_MONTHS = [
 
 digits = string.digits
 chars = set("".join(ABBR_MONTHS))
-whitelist = digits+"".join(sorted(chars))
+whitelist = ","+digits+"".join(sorted(chars))
 blacklist = "".join(sorted(set(string.ascii_letters) - chars))
 # Set the OCR configuration to recognize only dates in the format "dd/mm/yyyy"
 # REF: https://muthu.co/all-tesseract-ocr-options/
@@ -34,10 +34,10 @@ time_config = '--oem 3 --psm 7 -c tessedit_char_whitelist=,:APM0123456789 -c tes
 
 def get_date_string(frame, i):
     x, y = 20, 0
-    w, h = 120, 55
+    w, h = 120+85, 55
     roi = frame[y:y+h, x:x+w]
     # Debug
-    # cv2.imwrite(f"images/ds{i}.png", roi)
+    cv2.imwrite(f"images/ds{i}.png", roi)
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
@@ -102,19 +102,17 @@ def is_loading(frame, x, y):
 
 
 def find_headers(frame):
-    hh = 30
+    hh = 42
     px = 30
     headers = []
-    header_cnt = 0
-    y = 30
+    y = 20  # keep it the same as py
     height = 1400
-    while y <= height:
+    while y < height:
         if is_header(frame, px, y):
             headers.append(y)
-            header_cnt += 1
-            y += hh*2
+            y += hh
 
-        y += hh
+        y += 1
     return headers
 
 
@@ -149,8 +147,8 @@ def do_stitch_v2(data):
     cv2.imwrite(f'images/img_frame{i:04d}_stitched.png', stitched)
 
     # Debug
-    # for j, f in data:
-    #     cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
+    for j, f in data:
+        cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
 
 
 def check_loading(i, frame):
@@ -208,6 +206,10 @@ def run():
         if 253 <= r <= 255 and 245 <= g <= 253 and 224 <= b <= 247:
             # Crop the frame to the specified region
             cropped_frame = frame[y:y+height, x:x+width]
+
+            hs = find_headers(cropped_frame)
+            print("frame:{}, {}".format(i, hs))
+
             ds = get_date_string(cropped_frame, i)
             ds = ds.replace(" ", "")
             if len(ds) < 4:
@@ -215,18 +217,9 @@ def run():
                 i += 1
                 continue
 
-            if pre == ds:
-                print(f"Still the same date: {ds}")
-                i += jump
-                continue
-
-            pre = ds
-
             ts = get_time_string(cropped_frame, i)
             ts = ts.replace(":", "-")
 
-            hs = find_headers(cropped_frame)
-            print("frame:{}, {}".format(i, hs))
             if len(hs) > 1:
                 cv2.imwrite(f'images/img_frame{i:04d}_{ds}_{ts}.png', cropped_frame)
                 # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + step)
@@ -234,10 +227,13 @@ def run():
                 i += jump
                 continue
 
-            # Start
-            stitch = True
-            print(i, "start stitch")
-            to_stitch = [(i, cropped_frame)]
+            if stitch:
+                to_stitch.append((i, cropped_frame))
+            else:
+                # Start
+                stitch = True
+                print(i, "start stitch")
+                to_stitch = [(i, cropped_frame)]
             video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
             i += stitch_jump
 
