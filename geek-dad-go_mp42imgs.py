@@ -90,43 +90,33 @@ def smart_correct(text):
 
 def is_header(frame, x, y):
     r,g,b = frame[y, x, 2], frame[y, x, 1], frame[y, x, 0]
-
     return 253 <= r <= 255 and 250 <= g <= 253 and 224 <= b <= 247
+
+
+def is_header_border(frame, x, y):
+    r,g,b = frame[y, x, 2], frame[y, x, 1], frame[y, x, 0]
+    return 185 <= r <= 235 and 180 <= g <= 220 and 60 <= b <= 180
 
 
 def is_loading(frame, x, y):
     r,g,b = frame[y, x, 2], frame[y, x, 1], frame[y, x, 0]
-    print(r,g,b)
-
     return 200 <= r <= 252 and 200 <= g <= 252 and 200 <= b <= 252
 
 
 def find_headers(frame):
-    hh = 42
+    hh = 42+5
     px = 30
     headers = []
     y = 20  # keep it the same as py
-    height = 1400
+    # height = 1400
+    height = frame.shape[0]
     while y < height:
-        if is_header(frame, px, y):
+        if is_header(frame, px, y) or is_header_border(frame, px, y):
             headers.append(y)
             y += hh
 
         y += 1
     return headers
-
-
-def do_stitch(data):
-    frames = [x[1] for x in data]
-    i = data[0][0]
-    print("do stitch", len(frames))
-    stitcher = cv2.createStitcher(mode=cv2.Stitcher_SCANS) if imutils.is_cv3() else cv2.Stitcher_create(mode=cv2.Stitcher_SCANS)
-    (status, stitched) = stitcher.stitch(frames)
-    if status == cv2.STITCHER_OK:
-        # Display the stitched image
-        cv2.imwrite(f'images/img_frame{i:04d}_stitched.png', stitched)
-    else:
-        print('Error stitching images: status code %d' % status)
 
 
 def do_stitch_v2(data):
@@ -144,7 +134,7 @@ def do_stitch_v2(data):
             return
     print("stitched!")
     # Display the stitched image
-    cv2.imwrite(f'images/img_frame{i:04d}_stitched.png', stitched)
+    write_image(f'images/img_frame{i:04d}_stitched.png', stitched)
 
     # Debug
     for j, f in data:
@@ -172,6 +162,16 @@ def check_loading(i, frame):
 
     print("frame {} is loading".format(i))
     return True
+
+
+def write_image(filename, frame):
+    hs = find_headers(frame)
+    if len(hs) > 1:
+        print("hs > 1", hs)
+        offset = 10
+        frame = frame[0:hs[1]-offset, :]
+    cv2.imwrite(filename, frame)
+
 
 
 def run():
@@ -221,7 +221,7 @@ def run():
             ts = ts.replace(":", "-")
 
             if len(hs) > 1:
-                cv2.imwrite(f'images/img_frame{i:04d}_{ds}_{ts}.png', cropped_frame)
+                write_image(f'images/img_frame{i:04d}_{ds}_{ts}.png', cropped_frame)
                 # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + step)
                 video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + jump)
                 i += jump
@@ -238,18 +238,17 @@ def run():
             i += stitch_jump
 
         else:
-            cropped_frame = frame[y:y+height, x:x+width]
             if not stitch:
                 i += 1
                 continue
 
+            cropped_frame = frame[y:y+height, x:x+width]
             if check_loading(i, cropped_frame):
                 video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + 5)
                 i += 5
                 continue
 
             # Stitch on
-            cropped_frame = frame[y:y+height, x:x+width]
             hs = find_headers(cropped_frame)
 
             if len(hs) >= 1:
