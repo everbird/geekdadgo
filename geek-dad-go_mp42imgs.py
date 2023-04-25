@@ -3,6 +3,7 @@
 import cv2
 import pytesseract
 import string
+import imutils
 
 
 ABBR_MONTHS = [
@@ -25,12 +26,14 @@ chars = set("".join(ABBR_MONTHS))
 whitelist = digits+"".join(sorted(chars))
 blacklist = "".join(sorted(set(string.ascii_letters) - chars))
 # Set the OCR configuration to recognize only dates in the format "dd/mm/yyyy"
-date_config = '--oem 3 --psm 11 -c tessedit_char_whitelist={} -c tessedit_char_blacklist={}'.format(whitelist, blacklist)
-time_config = '--oem 3 --psm 11 -c tessedit_char_whitelist=,:APM0123456789 -c tessedit_char_blacklist={}'.format("".join(sorted(set(string.ascii_letters) - set("APM"))))
+# REF: https://muthu.co/all-tesseract-ocr-options/
+#
+date_config = '--oem 3 --psm 7 -c tessedit_char_whitelist={} -c tessedit_char_blacklist={}'.format(whitelist, blacklist)
+time_config = '--oem 3 --psm 7 -c tessedit_char_whitelist=,:APM0123456789 -c tessedit_char_blacklist={}'.format("".join(sorted(set(string.ascii_letters) - set("APM"))))
 
 
 def get_date_string(frame, i):
-    x, y = 20, 10
+    x, y = 20, 0
     w, h = 120, 55
     roi = frame[y:y+h, x:x+w]
     # Debug
@@ -47,13 +50,13 @@ def get_date_string(frame, i):
 
 
 def get_time_string(frame, i):
-    y = 125
+    y = 110
     x = 640
     w = 160
-    h = 50
+    h = 55
     roi = frame[y:y+h, x:x+w]
     # Debug
-    # cv2.imwrite(f"images/ts{i}.png", roi)
+    cv2.imwrite(f"images/ts{i}.png", roi)
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
@@ -85,19 +88,113 @@ def smart_correct(text):
     return "{}{}".format(month, r)
 
 
+def is_header(frame, x, y):
+    r,g,b = frame[y, x, 2], frame[y, x, 1], frame[y, x, 0]
+
+    return 253 <= r <= 255 and 250 <= g <= 253 and 224 <= b <= 247
+
+
+def is_loading(frame, x, y):
+    r,g,b = frame[y, x, 2], frame[y, x, 1], frame[y, x, 0]
+    print(r,g,b)
+
+    return 200 <= r <= 252 and 200 <= g <= 252 and 200 <= b <= 252
+
+
+def find_headers(frame):
+    hh = 30
+    px = 30
+    headers = []
+    header_cnt = 0
+    y = 30
+    height = 1400
+    while y <= height:
+        if is_header(frame, px, y):
+            headers.append(y)
+            header_cnt += 1
+            y += hh*2
+
+        y += hh
+    return headers
+
+
+def do_stitch(data):
+    frames = [x[1] for x in data]
+    i = data[0][0]
+    print("do stitch", len(frames))
+    stitcher = cv2.createStitcher(mode=cv2.Stitcher_SCANS) if imutils.is_cv3() else cv2.Stitcher_create(mode=cv2.Stitcher_SCANS)
+    (status, stitched) = stitcher.stitch(frames)
+    if status == cv2.STITCHER_OK:
+        # Display the stitched image
+        cv2.imwrite(f'images/img_frame{i:04d}_stitched.png', stitched)
+    else:
+        print('Error stitching images: status code %d' % status)
+
+
+def do_stitch_v2(data):
+    n = len(data)
+    frames = [x[1] for x in data]
+    i = data[0][0]
+    print("do stitch", len(frames))
+    stitcher = cv2.createStitcher(mode=cv2.Stitcher_SCANS) if imutils.is_cv3() else cv2.Stitcher_create(mode=cv2.Stitcher_SCANS)
+
+    stitched = frames[0]
+    for j in range(1, n):
+        (status, stitched) = stitcher.stitch([stitched, frames[j]])
+        if status != cv2.STITCHER_OK:
+            print('Error stitching images: status code %d' % status)
+            return
+    print("stitched!")
+    # Display the stitched image
+    cv2.imwrite(f'images/img_frame{i:04d}_stitched.png', stitched)
+
+    # Debug
+    # for j, f in data:
+    #     cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
+
+
+def check_loading(i, frame):
+    x = 350-30
+    y = 885-260
+    w = 180
+    h = 180
+    points = [
+        (x, y),
+        (x+w, y),
+        (x, y+h),
+        (x+w, y+h)
+    ]
+    # Debug
+    # roi = frame[y:y+h, x:x+w]
+    # cv2.imwrite(f"images/frame{i}-loading.png", roi)
+    print(f"check loading:{i}")
+    for xx, yy in points:
+        if not is_loading(frame, xx, yy):
+            return False
+
+    print("frame {} is loading".format(i))
+    return True
+
+
 def run():
     print(date_config)
     print(time_config)
-    video = cv2.VideoCapture('RPReplay_Final1681627796.MP4')
+    video = cv2.VideoCapture('RPReplay_Final1682408133.MP4')
+    # video = cv2.VideoCapture('RPReplay_Final1682069721.MP4')
+    # video = cv2.VideoCapture('RPReplay_Final1682069172.MP4')
+    # video = cv2.VideoCapture('RPReplay_Final1681627796.MP4')
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
 
     step = 1
-    jump = 40
+    jump = 15
     px = 30
-    py = 30
+    py = 20
 
     i = 0
     pre = None
+    stitch = False
+    to_stitch = []
+    stitch_jump = 30
     while i < frame_count:
         ret, frame = video.read()
         # Define the region to crop
@@ -108,12 +205,12 @@ def run():
 
         r,g,b = frame[py+y, px+x, 2], frame[py+y, px+x, 1], frame[py+y, px+x, 0]
 
-        if 253 <= r <= 255 and 250 <= g <= 253 and 224 <= b <= 247:
+        if 253 <= r <= 255 and 245 <= g <= 253 and 224 <= b <= 247:
             # Crop the frame to the specified region
             cropped_frame = frame[y:y+height, x:x+width]
             ds = get_date_string(cropped_frame, i)
             ds = ds.replace(" ", "")
-            if len(ds) < 5:
+            if len(ds) < 4:
                 print(f"Malformed OCR {ds}. Skipping ...")
                 i += 1
                 continue
@@ -127,13 +224,51 @@ def run():
 
             ts = get_time_string(cropped_frame, i)
             ts = ts.replace(":", "-")
-            cv2.imwrite(f'images/img_frame{i:04d}_{ds}_{ts}.png', cropped_frame)
-            # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + step)
-            video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + jump)
-            i += jump
-        else:
-            i += 1
 
+            hs = find_headers(cropped_frame)
+            print("frame:{}, {}".format(i, hs))
+            if len(hs) > 1:
+                cv2.imwrite(f'images/img_frame{i:04d}_{ds}_{ts}.png', cropped_frame)
+                # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + step)
+                video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + jump)
+                i += jump
+                continue
+
+            # Start
+            stitch = True
+            print(i, "start stitch")
+            to_stitch = [(i, cropped_frame)]
+            video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
+            i += stitch_jump
+
+        else:
+            cropped_frame = frame[y:y+height, x:x+width]
+            if not stitch:
+                i += 1
+                continue
+
+            if check_loading(i, cropped_frame):
+                video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + 5)
+                i += 5
+                continue
+
+            # Stitch on
+            cropped_frame = frame[y:y+height, x:x+width]
+            hs = find_headers(cropped_frame)
+
+            if len(hs) >= 1:
+                # End
+                print(i, "end stitch")
+                stitch = False
+                to_stitch.append((i, cropped_frame))
+                do_stitch_v2(to_stitch)
+                to_stitch = []
+            else:
+                print(i, "middle...")
+                to_stitch.append((i, cropped_frame))
+
+            video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
+            i += stitch_jump
 
 
 if __name__ == '__main__':
