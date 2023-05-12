@@ -3,7 +3,8 @@
 
 def check_color(frame, x, y, kind, config):
     r,g,b = frame[y, x, 2], frame[y, x, 1], frame[y, x, 0]
-    rr, gg, bb = config.data["colors"][kind]
+    c = config.data["colors"][kind]
+    rr,gg,bb = c['r'], c['g'], c['b']
     return rr[0] <= r <= rr[1] and gg[0] <= g <= gg[1] and bb[0] <= b <= bb[1]
 
 

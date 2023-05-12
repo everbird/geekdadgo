@@ -27,13 +27,16 @@ class Config(object):
 
         assert len(self.optional_config_paths) > 0, "At least 1 config file required."
 
-        with open(self.optional_config_paths[-1]) as f:
-            self.data = tomlkit.load(f)
+        for config_path in self.optional_config_paths:
+            if os.path.isfile(config_path):
+                with open(config_path) as f:
+                    self.data = tomlkit.load(f)
+                return
 
 
-    def get_ocr_config(kind):
-        ocr = self.config[f"ocr.{kind}"]
-        return f"--oem {ocr.oem} --psm {ocr.psm} -c tessedit_char_whitelist={ocr.whitelist} -c tessedit_char_blacklist={ocr.blacklist}"
+    def get_ocr_config(self, kind):
+        ocr = self.data[f"ocr"][kind]
+        return f"--oem {ocr['oem']} --psm {ocr['psm']} -c tessedit_char_whitelist={ocr['whitelist']} -c tessedit_char_blacklist={ocr['blacklist']}"
 
     @property
     def ocr_date_config(self):

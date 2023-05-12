@@ -5,3 +5,7 @@
 *.mp4
 *.MP4
 images
+.eggs
+build
+dist
+*.egg-info

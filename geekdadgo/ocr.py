@@ -23,7 +23,7 @@ def get_date_string(frame, i, config):
 
 
 def get_time_string(frame, i, config):
-    ocr = config["ocr"]["time"]
+    ocr = config.data["ocr"]["time"]
     x, y = ocr["x"], ocr["y"]
     w, h = ocr["width"], ocr["height"]
     roi = frame[y:y+h, x:x+w]

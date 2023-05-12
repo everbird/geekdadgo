@@ -14,48 +14,51 @@ from geekdadgo.ocr import get_date_string, get_time_string
 
 
 @click.group()
-def cli():
+def main():
     pass
 
 
-@cli.command()
-@click.option('--mp4-file', '-i', help="Path of MP4 file to process.")
+@main.command()
+@click.option('--mp4-filepath', '-i', help="Path of MP4 file to process.")
 @click.option('--output-dir', '-o', default="images", help="Output dir for extracted images.")
 @click.option(
     '-v', '--verbose',
     count=True,
-    help='''Verbose.
--v\tWARN log.
--vv\tINFO log.
--vvv\tDEBUG log.
+    help='''Verbose.\n
+-v\tWARN log.\n
+-vv\tINFO log.\n
+-vvv\tDEBUG log.\n
 -vvvv\tAll the log.'''
 )
 @click.option(
     '-c', '--config-path',
-    help=f'''Configuration file path.
-[1] .{__name__}.conf
-[2] ~/.{__name__}.conf
+    help=f'''Configuration file path.\n
+[1] .{__name__}.conf\n
+[2] ~/.{__name__}.conf\n
 [3] --config-path
 '''
 )
-def run(mp4_filepath, output_dir, verbose, config_path):
+@click.option(
+    '--log-file',
+    help='Path of log file.'
+)
+def run(mp4_filepath, output_dir, verbose, config_path, log_file):
     logger = setup_logger(__name__, verbose=verbose, log_file=log_file)
 
-    config = Config('easy_rate')
+    config = Config('geekdadgo')
     config.read(config_path)
 
     logger.info('verbose: {}'.format(verbose))
     logger.info('input: {}'.format(mp4_filepath))
     logger.info('output: {}'.format(output_dir))
 
-    logger.info('format: {}'.format(format))
-    logger.info('concurrent: {}'.format(concurrent))
-
     video = cv2.VideoCapture(mp4_filepath)
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    print("total frames:", frame_count)
 
     output_path = Path(output_dir)
 
+    print(config)
     key_jump = config.data["key-frame-scan"]["jump"]
     stitch_jump = config.data["stitch-scan"]["jump"]
 
@@ -67,6 +70,10 @@ def run(mp4_filepath, output_dir, verbose, config_path):
     to_stitch = []
     while i < frame_count:
         ret, frame = video.read()
+
+        if frame is None:
+            print("none frame found", i)
+            continue
 
         # Define the region to crop
         x = config.data["screen-crop"]["x"]
@@ -92,7 +99,8 @@ def run(mp4_filepath, output_dir, verbose, config_path):
             ts = ts.replace(":", "-")
 
             if len(hs) > 1:
-                write_image(output_path / f'img_frame{i:04d}_{ds}_{ts}.png', cropped_frame, config)
+                outputfile = output_path / f'img_frame{i:04d}_{ds}_{ts}.png'
+                write_image(outputfile.as_posix(), cropped_frame, config)
                 video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)
                 i += key_jump
                 continue
@@ -137,4 +145,4 @@ def run(mp4_filepath, output_dir, verbose, config_path):
 
 
 if __name__ == '__main__':
-    cli()
+    main()

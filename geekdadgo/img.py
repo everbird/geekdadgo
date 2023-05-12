@@ -33,6 +33,6 @@ def write_image(filename, frame, config, crop=True):
         hs = find_headers(frame, config)
         if len(hs) > 1:
             print("hs > 1", hs)
-            offset = config.data["key-frame-scan"]["offset"]
+            offset = config.data["key-frame-scan"]["crop_offset"]
             frame = frame[0:hs[1]-offset, :]
     cv2.imwrite(filename, frame)
