@@ -27,8 +27,9 @@ def do_stitch(data, config):
     write_image(f'images/img_frame{i:04d}_stitched.png', stitched, config)
 
     # Debug
-    for j, f in data:
-        cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
+    if config.data["app"]["debug"]:
+        for j, f in data:
+            cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
 
 
 def write_image(filename, frame, config, crop=True):

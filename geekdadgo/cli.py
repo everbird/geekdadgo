@@ -63,6 +63,7 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
     logger.info('verbose: {}'.format(verbose))
     logger.info('input: {}'.format(mp4_filepath))
     logger.info('output: {}'.format(output_dir))
+    logger.info("debug mode: {}".format(config.data["app"]["debug"]))
 
     video = cv2.VideoCapture(mp4_filepath)
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))

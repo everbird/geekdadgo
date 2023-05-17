@@ -11,7 +11,8 @@ def get_date_string(frame, i, config):
     w, h = ocr["width"], ocr["height"]
     roi = frame[y:y+h, x:x+w]
     # Debug
-    cv2.imwrite(f"images/ds{i}.png", roi)
+    if config.data["app"]["debug"]:
+        cv2.imwrite(f"images/ds{i}.png", roi)
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
@@ -29,7 +30,8 @@ def get_time_string(frame, i, config):
     w, h = ocr["width"], ocr["height"]
     roi = frame[y:y+h, x:x+w]
     # Debug
-    cv2.imwrite(f"images/ts{i}.png", roi)
+    if config.data["app"]["debug"]:
+        cv2.imwrite(f"images/ts{i}.png", roi)
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 

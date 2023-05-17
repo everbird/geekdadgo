@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import cv2
+
 
 def check_color(frame, x, y, kind, config):
     r,g,b = frame[y, x, 2], frame[y, x, 1], frame[y, x, 0]
@@ -38,8 +40,10 @@ def check_loading(i, frame, config):
         (x+w, y+h)
     ]
     # Debug
-    # roi = frame[y:y+h, x:x+w]
-    # cv2.imwrite(f"images/frame{i}-loading.png", roi)
+    if config.data["app"]["debug"]:
+        roi = frame[y:y+h, x:x+w]
+        cv2.imwrite(f"images/frame{i}-loading.png", roi)
+
     for xx, yy in points:
         if not check_color(frame, xx, yy, "loading", config):
             return False
