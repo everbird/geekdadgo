@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import cv2
+import logging
 import pytesseract
 
 
@@ -18,7 +19,7 @@ def get_date_string(frame, i, config):
     _text = _text.replace(" ", "")
     text = smart_correct(_text)
     if text != _text:
-        print("Correct: {} -> {}".format(_text, text))
+        logging.debug("Correction: {} -> {}".format(_text, text))
     return text.strip()
 
 

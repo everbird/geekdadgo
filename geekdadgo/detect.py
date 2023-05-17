@@ -40,10 +40,8 @@ def check_loading(i, frame, config):
     # Debug
     # roi = frame[y:y+h, x:x+w]
     # cv2.imwrite(f"images/frame{i}-loading.png", roi)
-    print(f"check loading:{i}")
     for xx, yy in points:
         if not check_color(frame, xx, yy, "loading", config):
             return False
 
-    print("frame {} is loading".format(i))
     return True

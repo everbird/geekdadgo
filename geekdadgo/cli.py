@@ -54,11 +54,10 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
 
     video = cv2.VideoCapture(mp4_filepath)
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-    print("total frames:", frame_count)
+    logger.info("total frames: {}".format(frame_count))
 
     output_path = Path(output_dir)
 
-    print(config)
     key_jump = config.data["key-frame-scan"]["jump"]
     stitch_jump = config.data["stitch-scan"]["jump"]
 
@@ -72,8 +71,8 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
         ret, frame = video.read()
 
         if frame is None:
-            print("none frame found", i)
-            continue
+            logger.warn("none frame found: {}".format(i))
+            break
 
         # Define the region to crop
         x = config.data["screen-crop"]["x"]
@@ -86,12 +85,12 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
             cropped_frame = frame[y:y+height, x:x+width]
 
             hs = find_headers(cropped_frame, config)
-            print("frame:{}, {}".format(i, hs))
+            logger.info("frame:{}, {}".format(i, hs))
 
             ds = get_date_string(cropped_frame, i, config)
             ds = ds.replace(" ", "")
             if len(ds) < 4:
-                print(f"Malformed OCR {ds}. Skipping ...")
+                logger.warn(f"Malformed OCR {ds}. Skipping ...")
                 i += 1
                 continue
 
@@ -110,7 +109,7 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
             else:
                 # Start
                 stitch = True
-                print(i, "start stitch")
+                logger.info("start stitch: {}".format(i))
                 to_stitch = [(i, cropped_frame)]
             video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
             i += stitch_jump
@@ -131,13 +130,13 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
 
             if len(hs) >= 1:
                 # End
-                print(i, "end stitch")
+                logger.info(format("end stitch: {}".format(i)))
                 stitch = False
                 to_stitch.append((i, cropped_frame))
                 do_stitch(to_stitch, config)
                 to_stitch = []
             else:
-                print(i, "middle...")
+                logger.info("middle: {}".format(i))
                 to_stitch.append((i, cropped_frame))
 
             video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
