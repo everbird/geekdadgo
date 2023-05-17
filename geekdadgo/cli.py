@@ -19,6 +19,18 @@ def main():
 
 
 @main.command()
+@click.option('--index', '-n', type=int, help="Frame index to get.")
+@click.option('--mp4-filepath', '-i', help="Path of MP4 file to process.")
+@click.option('--output', '-o', help="Output image file path.")
+def getframe(index, mp4_filepath, output):
+    video = cv2.VideoCapture(mp4_filepath)
+    frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + index)
+    ret, frame = video.read()
+    cv2.imwrite(output, frame)
+
+
+@main.command()
 @click.option('--mp4-filepath', '-i', help="Path of MP4 file to process.")
 @click.option('--output-dir', '-o', default="images", help="Output dir for extracted images.")
 @click.option(
