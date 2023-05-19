@@ -5,9 +5,10 @@ import imutils
 import logging
 
 from geekdadgo.detect import find_headers
+from geekdadgo.ocr import get_date_string, get_time_string
 
 
-def do_stitch(data, config):
+def do_stitch(data, output_path, source, config):
     n = len(data)
     frames = [x[1] for x in data]
     i = data[0][0]
@@ -16,7 +17,13 @@ def do_stitch(data, config):
         if imutils.is_cv3() \
         else cv2.Stitcher_create(mode=cv2.Stitcher_SCANS)
 
+    # Get ts and ds from the first image
     stitched = frames[0]
+    ds = get_date_string(stitched, i, config)
+    ds = ds.replace(" ", "")
+    ts = get_time_string(stitched, i, config)
+    ts = ts.replace(":", "-")
+
     for j in range(1, n):
         (status, stitched) = stitcher.stitch([stitched, frames[j]])
         if status != cv2.STITCHER_OK:
@@ -24,7 +31,15 @@ def do_stitch(data, config):
             return
     logging.debug("stitched!")
     # Display the stitched image
-    write_image(f'images/img_frame{i:04d}_stitched.png', stitched, config)
+    filename_format = config.data["app"]["output_filename_format"]
+    outputfile = output_path / filename_format.format(
+        source=source,
+        i=i,
+        tag="s",
+        ds=ds,
+        ts=ts
+    )
+    write_image(outputfile.as_posix(), stitched, config)
 
     # Debug
     if config.data["app"]["debug"]:

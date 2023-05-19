@@ -41,7 +41,7 @@ def get_time_string(frame, i, config):
 
 
 def smart_correct(text):
-    corrections = {
+    day_corrections = {
         "O": "0",
         "L": "1",
         "R": "2",
@@ -52,12 +52,23 @@ def smart_correct(text):
         "T": "7",
         "B": "8",
     }
+    month_corrections = {v:k for k,v in day_corrections.items()}
+    if text.startswith(","):
+        text = text[1:]
+
     month = text[:3]
-    day = text[3:]
-    r = ""
-    for ch in day:
-        if ch in corrections:
-            r += corrections[ch]
+    rm = ""
+    for ch in month:
+        if ch in month_corrections:
+            rm += month_corrections[ch]
         else:
-            r += ch
-    return "{}{}".format(month, r)
+            rm += ch
+
+    day = text[3:]
+    rd = ""
+    for ch in day:
+        if ch in day_corrections:
+            rd += day_corrections[ch]
+        else:
+            rd += ch
+    return "{}{}".format(rm, rd)

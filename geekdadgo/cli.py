@@ -65,6 +65,9 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
     logger.info('output: {}'.format(output_dir))
     logger.info("debug mode: {}".format(config.data["app"]["debug"]))
 
+    inputfile = Path(mp4_filepath)
+    source = inputfile.stem
+
     video = cv2.VideoCapture(mp4_filepath)
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     logger.info("total frames: {}".format(frame_count))
@@ -111,7 +114,14 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
             ts = ts.replace(":", "-")
 
             if len(hs) > 1:
-                outputfile = output_path / f'img_frame{i:04d}_{ds}_{ts}.png'
+                filename_format = config.data["app"]["output_filename_format"]
+                outputfile = output_path / filename_format.format(
+                    source=source,
+                    i=i,
+                    tag="n",
+                    ds=ds,
+                    ts=ts
+                )
                 write_image(outputfile.as_posix(), cropped_frame, config)
                 video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)
                 i += key_jump
@@ -146,7 +156,7 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
                 logger.info(format("end stitch: {}".format(i)))
                 stitch = False
                 to_stitch.append((i, cropped_frame))
-                do_stitch(to_stitch, config)
+                do_stitch(to_stitch, output_path, source, config)
                 to_stitch = []
             else:
                 logger.info("middle: {}".format(i))
