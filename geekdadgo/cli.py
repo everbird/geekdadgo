@@ -10,7 +10,9 @@ from geekdadgo.config import Config
 from geekdadgo.detect import check_color, check_loading, find_headers
 from geekdadgo.img import do_stitch, write_image
 from geekdadgo.log import setup_logger
-from geekdadgo.ocr import get_date_string, get_time_string
+from geekdadgo.ocr import (
+    get_date_string, get_time_string, text2datetime, datetime2text
+)
 
 
 @click.group()
@@ -105,13 +107,15 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
 
             ds = get_date_string(cropped_frame, i, config)
             ds = ds.replace(" ", "")
-            if len(ds) < 4:
-                logger.warn(f"Malformed OCR {ds}. Skipping ...")
+            ts = get_time_string(cropped_frame, i, config)
+
+            dt = text2datetime(f"{ds} {ts}")
+            if not dt:
+                logging.warn(f"Failed to parse datetime for the image since frame {i}")
                 i += 1
                 continue
-
-            ts = get_time_string(cropped_frame, i, config)
-            ts = ts.replace(":", "-")
+            dt_text = datetime2text(dt)
+            dt_text = dt_text.replace(":", "-")
 
             if len(hs) > 1:
                 filename_format = config.data["app"]["output_filename_format"]
@@ -119,8 +123,7 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
                     source=source,
                     i=i,
                     tag="n",
-                    ds=ds,
-                    ts=ts
+                    dt_text=dt_text
                 )
                 write_image(outputfile.as_posix(), cropped_frame, config)
                 video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)

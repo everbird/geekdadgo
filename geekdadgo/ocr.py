@@ -3,6 +3,9 @@
 import cv2
 import logging
 import pytesseract
+from dateutil import parser
+
+from datetime import datetime
 
 
 def get_date_string(frame, i, config):
@@ -72,3 +75,19 @@ def smart_correct(text):
         else:
             rd += ch
     return "{}{}".format(rm, rd)
+
+
+def text2datetime(text):
+    try:
+        dt = parser.parse(text, fuzzy=True)
+        if dt.year == 1900:
+            current_year = datetime.now().year
+            dt = dt.replace(year=current_year)
+        return dt
+    except ValueError as ex:
+        logging.error(f"Failed to parse text to datetime: {text}. Detailed error message {ex}")
+
+
+def datetime2text(dt):
+    datetime_format = "%Y-%m-%dT%H:%M:%S"
+    return dt.strftime(datetime_format)

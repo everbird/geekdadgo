@@ -5,7 +5,9 @@ import imutils
 import logging
 
 from geekdadgo.detect import find_headers
-from geekdadgo.ocr import get_date_string, get_time_string
+from geekdadgo.ocr import (
+    get_date_string, get_time_string, text2datetime, datetime2text
+)
 
 
 def do_stitch(data, output_path, source, config):
@@ -22,7 +24,12 @@ def do_stitch(data, output_path, source, config):
     ds = get_date_string(stitched, i, config)
     ds = ds.replace(" ", "")
     ts = get_time_string(stitched, i, config)
-    ts = ts.replace(":", "-")
+    dt = text2datetime(f"{ds} {ts}")
+    if not dt:
+        logging.error(f"Failed to parse datetime for this stitched image since frame {i}")
+        return
+    dt_text = datetime2text(dt)
+    dt_text = dt_text.replace(":", "-")
 
     for j in range(1, n):
         (status, stitched) = stitcher.stitch([stitched, frames[j]])
@@ -36,8 +43,7 @@ def do_stitch(data, output_path, source, config):
         source=source,
         i=i,
         tag="s",
-        ds=ds,
-        ts=ts
+        dt_text=dt_text
     )
     write_image(outputfile.as_posix(), stitched, config)
 
