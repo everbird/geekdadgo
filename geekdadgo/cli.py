@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
+import logging
+from pathlib import Path
+
 import click
 import cv2
-import logging
-
-from pathlib import Path
+from exiftool import ExifToolHelper
 
 from geekdadgo.config import Config
 from geekdadgo.detect import check_color, check_loading, find_headers
@@ -18,6 +19,25 @@ from geekdadgo.ocr import (
 @click.group()
 def main():
     pass
+
+
+@main.command(
+    help="Update the DateTimeOriginal of png images in the given directory by parsing the filename in a format like *_2023-02-13T14-40-00.png"
+)
+@click.option('--images-directory', '-i', help="Directory path of the image files to update.")
+def update_dto(images_directory):
+    p = Path(images_directory)
+    with ExifToolHelper() as et:
+        for image_path in p.rglob("*.png"):
+            print(image_path)
+            image_posixpath = image_path.as_posix()
+            dt_str = image_path.stem.split("_")[-1]
+            dt_str = dt_str.replace("-", ":").replace("T", " ")
+            et.set_tags(
+                [image_posixpath],
+                tags={"DateTimeOriginal": dt_str},
+                params=["-P", "-overwrite_original"]
+            )
 
 
 @main.command()
