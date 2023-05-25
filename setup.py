@@ -17,7 +17,7 @@ setuptools.setup(
         'imutils==0.5.4',
         'opencv-python==4.7.0.72',
         'pytesseract==0.3.10',
-        'requests==2.28.2',
+        'requests==2.31.0',
         'tomli==2.0.1',
         'tomlkit==0.11.8',
         'urllib3==1.26.15',
