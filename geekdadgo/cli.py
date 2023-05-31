@@ -9,7 +9,7 @@ from exiftool import ExifToolHelper
 
 from geekdadgo.config import Config
 from geekdadgo.detect import check_color, check_loading, find_headers
-from geekdadgo.img import do_stitch, write_image
+from geekdadgo.img import do_stitch, write_image, split_images
 from geekdadgo.log import setup_logger
 from geekdadgo.ocr import (
     get_date_string, get_time_string, text2datetime, datetime2text
@@ -28,11 +28,11 @@ def main():
 def update_dto(images_directory):
     p = Path(images_directory)
     with ExifToolHelper() as et:
-        for image_path in p.rglob("*.png"):
-            print(image_path)
+        for image_path in p.rglob("*.[jpg jpeg png]*"):
             image_posixpath = image_path.as_posix()
             dt_str = image_path.stem.split("_")[-1]
             dt_str = dt_str.replace("-", ":").replace("T", " ")
+            logging.info(f"Updating DateTimeOriginal to {dt_str} for {image_path}.")
             et.set_tags(
                 [image_posixpath],
                 tags={"DateTimeOriginal": dt_str},
@@ -105,12 +105,18 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
     i = 0
     stitch = False
     to_stitch = []
+    pre_dt = None
+    last_frame = None
+    last_i = 0
     while i < frame_count:
         ret, frame = video.read()
 
         if frame is None:
             logger.warn("none frame found: {}".format(i))
             break
+
+        last_frame = frame
+        last_i = i
 
         # Define the region to crop
         x = config.data["screen-crop"]["x"]
@@ -134,6 +140,13 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
                 logging.warn(f"Failed to parse datetime for the image since frame {i}")
                 i += 1
                 continue
+            elif dt == pre_dt:
+                logging.warn(f"The duplicate frame found at {i} for datetime:{dt}. Skipping ...")
+                video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)
+                i += key_jump
+                continue
+            pre_dt = dt
+
             dt_text = datetime2text(dt)
             dt_text = dt_text.replace(":", "-")
 
@@ -187,6 +200,10 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
 
             video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
             i += stitch_jump
+
+    if last_frame is not None:
+        cropped_frame = last_frame[y:y+height, x:x+width]
+        split_images(cropped_frame, last_i, config, output_path, source, pre_dt)
 
 
 if __name__ == '__main__':

@@ -53,6 +53,43 @@ def do_stitch(data, output_path, source, config):
             cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
 
 
+def split_images(frame, index, config, output_path, source, pre_dt):
+    hs = find_headers(frame, config)
+    logging.debug("frame to split:{}, {}".format(index, hs))
+    write_image("images/last.png", frame, config, crop=False)
+    filename_format = config.data["app"]["output_filename_format"]
+    offset = config.data["key-frame-scan"]["crop_offset"]
+    py = config.data["key-frame-scan"]["y"]
+    header_count = len(hs)
+    for i, header in enumerate(hs):
+        logging.debug(f"header: {header}")
+        start = header-py if header > py else 0
+        if i == header_count-1:
+            cropped_frame = frame[start:, :]
+        else:
+            cropped_frame = frame[start:hs[i+1]-offset, :]
+
+        ds = get_date_string(cropped_frame, i, config)
+        ds = ds.replace(" ", "")
+        ts = get_time_string(cropped_frame, i, config)
+
+        dt = text2datetime(f"{ds} {ts}")
+        if pre_dt == dt:
+            logging.debug(f"Skip {i} {header} since detected dt {dt} is the same as pre_dt {pre_dt}")
+            continue
+
+        dt_text = datetime2text(dt)
+        dt_text = dt_text.replace(":", "-")
+
+        outputfile = output_path / filename_format.format(
+            source=source,
+            i=index,
+            tag=f"m{i}",
+            dt_text=dt_text
+        )
+        write_image(outputfile.as_posix(), cropped_frame, config, crop=False)
+
+
 def write_image(filename, frame, config, crop=True):
     if crop:
         hs = find_headers(frame, config)
