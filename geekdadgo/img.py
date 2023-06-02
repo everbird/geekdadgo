@@ -3,6 +3,7 @@
 import cv2
 import imutils
 import logging
+import numpy as np
 
 from geekdadgo.detect import find_headers
 from geekdadgo.ocr import (
@@ -37,8 +38,17 @@ def do_stitch(data, output_path, source, config):
     dt_text = dt_text.replace(":", "-")
 
     for j in range(1, n):
-        (status, stitched) = stitcher.stitch([stitched, frames[j]])
-        if config.data["app"]["debug"] and stitched:
+        images = (stitched, frames[j])
+        # Only stitch the bottom half for the first image
+        mask1 = np.zeros(images[0].shape[:2], dtype=np.uint8)
+        mask1[(images[0].shape[0]//2):, :] = 255
+
+        # Only stitch the top half for the second image
+        mask2 = np.zeros(images[1].shape[:2], dtype=np.uint8)
+        mask2[:(images[1].shape[0]//2), :] = 255
+
+        (status, stitched) = stitcher.stitch(images, masks=(mask1, mask2))
+        if config.data["app"]["debug"] and stitched is not None:
             cv2.imwrite(f"images/frame{i:04d}-stiched{j}-debug.png", stitched)
 
         if status != cv2.STITCHER_OK:
