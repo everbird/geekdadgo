@@ -47,13 +47,19 @@ def do_stitch(data, output_path, source, config):
         mask2 = np.zeros(images[1].shape[:2], dtype=np.uint8)
         mask2[:(images[1].shape[0]//2), :] = 255
 
+        pre_stitched = stitched
         (status, stitched) = stitcher.stitch(images, masks=(mask1, mask2))
+        if status != cv2.STITCHER_OK:
+            # Try stitch() w/o masks. It could succeed sometimes.
+            logging.warn("Stitch with masks failed. Trying stitch without mask ...")
+            (status, stitched) = stitcher.stitch(images)
+
         if config.data["app"]["debug"] and stitched is not None:
             cv2.imwrite(f"images/frame{i:04d}-stiched{j}-debug.png", stitched)
 
         if status != cv2.STITCHER_OK:
-            logging.error('Error stitching images: status code %d' % status)
-            logging.info("Writing the first images as fallback ...")
+            logging.error(f'Error stitching images at {j}: status code {status}')
+            logging.info("Writing the most recently stitched image as fallback ...")
             filename_format = config.data["app"]["output_filename_format"]
             outputfile = output_path / filename_format.format(
                 source=source,
@@ -61,7 +67,7 @@ def do_stitch(data, output_path, source, config):
                 tag="sf",
                 dt_text=dt_text
             )
-            write_image(outputfile.as_posix(), frames[0], config)
+            write_image(outputfile.as_posix(), pre_stitched, config)
 
             return
     logging.debug("stitched!")
