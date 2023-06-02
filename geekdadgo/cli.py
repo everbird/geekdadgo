@@ -141,10 +141,13 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
                 i += 1
                 continue
             elif dt == pre_dt:
-                logging.warn(f"The duplicate frame found at {i} for datetime:{dt}. Skipping ...")
-                video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)
+                logging.warn(f"Duplicate frame found at {i} for datetime:{dt}. Skipping ...")
+                # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)
+                #
                 i += key_jump
+                video.set(cv2.CAP_PROP_POS_FRAMES, i)
                 continue
+
             pre_dt = dt
 
             dt_text = datetime2text(dt)
@@ -159,8 +162,9 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
                     dt_text=dt_text
                 )
                 write_image(outputfile.as_posix(), cropped_frame, config)
-                video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)
+                # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + key_jump)
                 i += key_jump
+                video.set(cv2.CAP_PROP_POS_FRAMES, i)
                 continue
 
             if stitch:
@@ -170,8 +174,9 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
                 stitch = True
                 logger.info("start stitch: {}".format(i))
                 to_stitch = [(i, cropped_frame)]
-            video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
+            # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
             i += stitch_jump
+            video.set(cv2.CAP_PROP_POS_FRAMES, i)
 
         else:
             if not stitch:
@@ -180,8 +185,9 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
 
             cropped_frame = frame[y:y+height, x:x+width]
             if check_loading(i, cropped_frame, config):
-                video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + 5)
+                # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + 5)
                 i += 5
+                video.set(cv2.CAP_PROP_POS_FRAMES, i)
                 continue
 
             # Stitch on
@@ -198,10 +204,15 @@ def run(mp4_filepath, output_dir, verbose, config_path, log_file):
                 logger.info("middle: {}".format(i))
                 to_stitch.append((i, cropped_frame))
 
-            video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
+            # video.set(cv2.CAP_PROP_POS_FRAMES, video.get(cv2.CAP_PROP_POS_FRAMES) + stitch_jump)
             i += stitch_jump
+            video.set(cv2.CAP_PROP_POS_FRAMES, i)
 
-    if last_frame is not None:
+    if to_stitch:
+        # End
+        logger.info(format("end stitch out of while loop: {}".format(i)))
+        do_stitch(to_stitch, output_path, source, config)
+    elif last_frame is not None:
         cropped_frame = last_frame[y:y+height, x:x+width]
         split_images(cropped_frame, last_i, config, output_path, source, pre_dt)
 

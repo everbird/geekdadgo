@@ -19,6 +19,11 @@ def do_stitch(data, output_path, source, config):
         if imutils.is_cv3() \
         else cv2.Stitcher_create(mode=cv2.Stitcher_SCANS)
 
+    # Debug
+    if config.data["app"]["debug"]:
+        for j, f in data:
+            cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
+
     # Get ts and ds from the first image
     stitched = frames[0]
     ds = get_date_string(stitched, i, config)
@@ -33,8 +38,21 @@ def do_stitch(data, output_path, source, config):
 
     for j in range(1, n):
         (status, stitched) = stitcher.stitch([stitched, frames[j]])
+        if config.data["app"]["debug"] and stitched:
+            cv2.imwrite(f"images/frame{i:04d}-stiched{j}-debug.png", stitched)
+
         if status != cv2.STITCHER_OK:
             logging.error('Error stitching images: status code %d' % status)
+            logging.info("Writing the first images as fallback ...")
+            filename_format = config.data["app"]["output_filename_format"]
+            outputfile = output_path / filename_format.format(
+                source=source,
+                i=i,
+                tag="sf",
+                dt_text=dt_text
+            )
+            write_image(outputfile.as_posix(), frames[0], config)
+
             return
     logging.debug("stitched!")
     # Display the stitched image
@@ -47,16 +65,11 @@ def do_stitch(data, output_path, source, config):
     )
     write_image(outputfile.as_posix(), stitched, config)
 
-    # Debug
-    if config.data["app"]["debug"]:
-        for j, f in data:
-            cv2.imwrite(f"images/frame{i:04d}-debug{j}.png", f)
 
 
 def split_images(frame, index, config, output_path, source, pre_dt):
     hs = find_headers(frame, config)
     logging.debug("frame to split:{}, {}".format(index, hs))
-    write_image("images/last.png", frame, config, crop=False)
     filename_format = config.data["app"]["output_filename_format"]
     offset = config.data["key-frame-scan"]["crop_offset"]
     py = config.data["key-frame-scan"]["y"]
