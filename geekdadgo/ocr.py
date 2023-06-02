@@ -78,6 +78,10 @@ def smart_correct(text):
 
 
 def text2datetime(text):
+    if "," in text:
+        ds, ts = text.split(" ")
+        date, year = ds.split(",")
+        text = f"{year[:4]} {date} {ts}"
     try:
         dt = parser.parse(text, fuzzy=True)
         if dt.year == 1900:
