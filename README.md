@@ -41,7 +41,12 @@
 
 ### Step 2. 使用索引 csv 文件下载照片/视频
 
-打开命令行终端（Terminal 或 iTerm2 之类），用 wget 并行下载 csv 文件中 url 对应的数据。
+打开命令行终端（Terminal 或 iTerm2 之类），执行以下命令：
+
+``` bash
+cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}' | xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'
+```
+该命令用 wget 并行下载 csv 文件中 url 对应的数据，所以执行前请确保 wget 已安装。下载时间跟网速和图片数量有关，附上例子如下：
 
 > ~/Downloads/procare
 > ❯ time cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}' | xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'
@@ -54,6 +59,13 @@
 >     2114
 
 ### Step 3. 更新照片的 EXIF original date (视频不需要此步骤)
+
+执行以下命令：
+
+``` bash
+geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
+```
+所以 -i 参数对应目录中的 png, jpg, jpeg 文件都会被遍历，按文件名以下划线(_)分隔后末尾的时间来更新该图片的 EXIF original date。附上例子如下：
 
 > ~/playground/geekdadgo main* ⇣
 > html2pdf ❯ time geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
