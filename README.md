@@ -29,7 +29,7 @@
 ## 如何安装？
 
 ``` bash
-brew install tesseract 
+brew install tesseract exiftool
 
 ```
 推荐使用 [pyenv](https://github.com/pyenv/pyenv#installation) 和 virtualenv 避免影响系统 python 
