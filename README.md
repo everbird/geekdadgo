@@ -35,15 +35,27 @@ brew install tesseract
 推荐使用 [pyenv](https://github.com/pyenv/pyenv#installation) 和 virtualenv 避免影响系统 python 
 
 ``` bash
+# Use 3.9.2 for example, you can use whatever version >= 3
 pyenv install 3.9.2
+
+# Setup and activate a virtual environment
 pyenv virtualenv 3.9.2 geekdadgo-runtime
 pyenv activate geekdadgo-runtime
+
+# Upgrade pip to avoid troubles
 python -m pip install --upgrade pip
+
+# Install geekdadgo
 pip install git+https://github.com/everbird/geekdadgo.git@v0.1.0
+
+# Download config file
+wget -O ~/.geekdadgo.conf https://raw.githubusercontent.com/everbird/geekdadgo/main/config/.geekdadgo.conf
 geekdadgo --help
 ```
 
 ## 如何导出照片/视频？
+
+下面均以手机用 iPhone X Max，桌面系统用 macOS，浏览器用 Firefox 为例，不再做特殊说明。若使用不同，请自行做相应调整。
 
 ### Step 1. 导出照片/视频索引 csv 文件
 
@@ -87,3 +99,35 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 > geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24  13.23s user 4.67s system 73% cpu 24.420 total
 
 ## 如何导出 Note / Meal 等？
+
+开始之前，先准备好屏幕录制功能。在 Settings -> Control Center 中加入 Screen Recording，这样从屏幕右上角下划时，会有屏幕录制按钮。
+
+打开 Procare 移动端 App，在 Activity 标签中点击宝宝名字右下方的漏斗图标，在 Activity Filter 页面，将默认的 "All Activities" 改为你想要保存的活动类型，例如 Note 或 Meals 等。再依次选择起始时间和结束时间后，点击 APPLY 按钮得到你所选择类别和时间范围的列表。注意 App 中时间范围目测一次最多选 85 天，所以推荐按月操作。
+
+开始录制之前，先将屏幕一直划到底部，让所有需要加载的新数据全都显示出来，直到看到底部"This is the end of your activities"。
+
+双击顶部状态栏回到页面最顶部，从屏幕右上角下划，选择屏幕录制按钮，在开始倒计时时回到 Procare 页面，屏幕左上角出现红色按钮时，开始录制屏幕。
+
+尽量匀速上划，直到再次看到底部。然后点击左上角红色按钮结束录制。请保障所录制的内容不包含切换程序、加载、通知条等影响画面的元素，必要时可开启 Do Not Disturb 模式。
+
+将录制好的 mp4 文件传输到电脑上(例如我直接用的 AirDrop)
+
+用以下命令将 mp4 文件按日提取成图片，放在 images 目录内：
+``` bash
+geekdadgo run -o images -i procare-note-20230301-20230331.MP4 
+```
+注意你可以用 -o 指定自己的输出目录，用 --config-path 指定自定义配置，用 -vvvv 开启更多日志。
+
+提取后请自行验收一遍图片，若出现严重遗漏、OCR偏差、缝合错位等，可能调整配置文件中的相应参数来适应你的情况
+
+用以下命令更新图片的 EXIF original date
+
+``` bash
+geekdadgo update-dto -i images
+```
+
+如有必要，可以考虑用不同的配置文件，将同一个 mp4 文件的图片提取到不同目录，然后从中挑选出每日较好的那张。
+
+
+
+
