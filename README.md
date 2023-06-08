@@ -79,7 +79,7 @@ cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", 
 > ❯ time cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}' | xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'\
 > cat procare-photos-csv-2022-07-12_to_2023-05-24.csv  0.00s user 0.00s system 0% cpu 2:07.15 total\
 > awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}'  0.04s user 0.01s system 0% cpu 2:53.29 total\
-> xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'  85.71s user 31.48s system 60% cpu 3:12.35 total\
+> xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'  85.71s user 31.48s system 60% cpu 3:12.35 total
 > 
 > ~/Downloads/procare 3m 12s\
 > ❯ cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | wc -l\
@@ -92,7 +92,7 @@ cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", 
 ``` bash
 geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 ```
-所以 -i 参数对应目录中的 png, jpg, jpeg 文件都会被遍历，按文件名以下划线(_)分隔后末尾的时间来更新该图片的 EXIF original date。附上例子如下：
+所有 -i 参数对应目录中的 png, jpg, jpeg 文件都会被遍历，按文件名以下划线(_)分隔后末尾的时间来更新该图片的 EXIF original date。附上例子如下：
 
 > ~/playground/geekdadgo main* ⇣\
 > ❯ time geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24\
@@ -118,7 +118,7 @@ geekdadgo run -o images -i procare-note-20230301-20230331.MP4
 ```
 注意你可以用 -o 指定自己的输出目录，用 --config-path 指定自定义配置，用 -vvvv 开启更多日志。
 
-提取后请自行验收一遍图片，若出现严重遗漏、OCR偏差、缝合错位等，可能调整配置文件中的相应参数来适应你的情况
+提取后请自行验收一遍图片，若出现严重遗漏、OCR偏差、缝合错位等，可以调整配置文件中的相应参数来适应你的情况
 
 用以下命令更新图片的 EXIF original date
 
