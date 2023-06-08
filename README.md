@@ -48,14 +48,14 @@ cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", 
 ```
 该命令用 wget 并行下载 csv 文件中 url 对应的数据，所以执行前请确保 wget 已安装。下载时间跟网速和图片数量有关，附上例子如下：
 
-> ~/Downloads/procare
-> ❯ time cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}' | xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'
-> cat procare-photos-csv-2022-07-12_to_2023-05-24.csv  0.00s user 0.00s system 0% cpu 2:07.15 total
-> awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}'  0.04s user 0.01s system 0% cpu 2:53.29 total
-> xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'  85.71s user 31.48s system 60% cpu 3:12.35 total
+> ~/Downloads/procare\
+> ❯ time cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}' | xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'\
+> cat procare-photos-csv-2022-07-12_to_2023-05-24.csv  0.00s user 0.00s system 0% cpu 2:07.15 total\
+> awk -F, '{ gsub(":", "-", $2); gsub(/\..*$/, "", $2); print $1,$2,$3}'  0.04s user 0.01s system 0% cpu 2:53.29 total\
+> xargs -n3 -P8 sh -c 'wget -q -O photos_2022-07-12_to_2023-05-24/$0_$1.jpg $2'  85.71s user 31.48s system 60% cpu 3:12.35 total\
 > 
-> ~/Downloads/procare 3m 12s
-> ❯ cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | wc -l
+> ~/Downloads/procare 3m 12s\
+> ❯ cat procare-photos-csv-2022-07-12_to_2023-05-24.csv | wc -l\
 >     2114
 
 ### Step 3. 更新照片的 EXIF original date (视频不需要此步骤)
@@ -67,8 +67,8 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 ```
 所以 -i 参数对应目录中的 png, jpg, jpeg 文件都会被遍历，按文件名以下划线(_)分隔后末尾的时间来更新该图片的 EXIF original date。附上例子如下：
 
-> ~/playground/geekdadgo main* ⇣
-> html2pdf ❯ time geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
+> ~/playground/geekdadgo main* ⇣\
+> ❯ time geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24\
 > geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24  13.23s user 4.67s system 73% cpu 24.420 total
 
 ## 如何导出 Note / Meal 等？
