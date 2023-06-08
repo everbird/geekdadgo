@@ -1,6 +1,6 @@
 # Geek Dad Go
 
-帮助家长从 Procare 下载自己宝宝的数据（包括但不限于照片、视频、Note、Meal等）
+帮助家长从 Procare 下载自家宝宝的数据（包括但不限于照片、视频、Note、Meal等）
 
 ## Why?
 
@@ -20,13 +20,28 @@
 
 - 从 mp4 视频中逐帧分析，提取每日 Note/Meal 等
 
-- OCR 识别日期和时间，更新 [EXIF original date](https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif/datetimeoriginal.html) 信息
+- OCR 识别日期和时间，更新 [EXIF original date](https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif/datetimeoriginal.html) 信息(这样该照片在照片流按拍摄时间排序时，才会被放到对应那一天)
 
 - 按日将长图和多个图片缝合（stitch）成一张图片
 
-- 可通过更改 config 微调对 mp4 视频的分析细节
+- 可通过更改 config 微调对 mp4 视频的分析细节(仅测试过 iPhone X Max，其他厂商或型号手机录制的 mp4 可能需要调整参数，例如调整 OCR 识别日期、时间的正确位置，提高识别准确率)
 
 ## 如何安装？
+
+``` bash
+brew install tesseract 
+
+```
+推荐使用 [pyenv](https://github.com/pyenv/pyenv#installation) 和 virtualenv 避免影响系统 python 
+
+``` bash
+pyenv install 3.9.2
+pyenv virtualenv 3.9.2 geekdadgo-runtime
+pyenv activate geekdadgo-runtime
+python -m pip install --upgrade pip
+pip install git+https://github.com/everbird/geekdadgo.git@v0.1.0
+geekdadgo --help
+```
 
 ## 如何导出照片/视频？
 
