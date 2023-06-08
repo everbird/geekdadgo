@@ -1,6 +1,6 @@
 # Geek Dad Go
 
-帮助父母从 Procare 下载宝宝的数据（包括但不限于照片、视频、Note、Meal等）
+帮助家长从 Procare 下载自己宝宝的数据（包括但不限于照片、视频、Note、Meal等）
 
 ## Why?
 
@@ -9,14 +9,14 @@
 2. 用手机访问的 App，可以按活动类别展示指定日期内的数据（目测一次最多选85天），但无法从 App 上复制粘贴文字信息（要保存只能截屏）
 3. 就算是手工下载或截屏的照片，照片的拍摄日期信息也没法一并保存（在按拍摄时间排序的照片流里，可能会用下载时间代替拍摄时间，或者显示为 NODATE，会显得很凌乱）
 
-因此想找到一个拿到这些数据的办法，以便按自己的喜欢的方式管理（例如照片/图片放在 Amazon Photos，视频放在 Google Photos），摆脱只能在 Procare 中查看的境况。
+因此想找到一个拿到这些数据的办法，以便按自己的喜欢的方式管理（例如照片/图片放在 Amazon Photos，视频放在 Google Photos），摆脱只能在 Procare 中查看的囧境。
 
 ## 思路
 
 对于照片和视频，先通过 userscript 把下载文件的url和元信息保存到一个 csv 文件，再通过命令行根据 csv 文件并行下载文件，并更新其元信息；
 对于 Note、Meal 或其他，先在手机 App 上录制成 MP4 视频，再通过 python 脚本提取成按日聚合的图片；
 
-## Highlights
+## Highlight Features
 
 - 从 mp4 视频中逐帧分析，提取每日 Note/Meal 等
 
@@ -33,9 +33,9 @@
 ### Step 1. 导出照片/视频索引 csv 文件
 
 1. 安装 [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) (Firfox) 或 [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) (Chrome )
-2. 安装 geek-dad-go_exporter.user.js userscript 脚本 (点击 Greasemonkey/Tampermonkey 按钮，选 “New user script ...“，将文件内容复制粘贴后保存 )
-3. 打开或刷新 Procare Web 页面，例如 [Dashboard](https://schools.procareconnect.com/dashboard)
-4. 点击页面右下角 "Export photo/video links" 按钮
+2. 安装 [geek-dad-go_exporter.user.js](https://raw.githubusercontent.com/everbird/geekdadgo/main/geek-dad-go_exporter.user.js) userscript 脚本 (点击链接即可提示安装，或者自己手工安装：点击 Greasemonkey/Tampermonkey 按钮，选 “New user script ...“，将文件内容复制粘贴后保存 )
+3. 打开或刷新 Procare Web 页面，例如 [School Dashboard](https://schools.procareconnect.com/dashboard)
+4. 点击页面右下角新出现的 "Export photo/video links" 按钮
 5. 在弹出对话框中填写 起始时间 和 结束时间
 6. 等待生成并下载 csv 文件，你可以通过浏览器自带的 Web Developer Tools 在 Console 中查看进度
 
