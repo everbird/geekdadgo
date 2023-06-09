@@ -102,8 +102,8 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 
 开始之前，先准备好屏幕录制功能。在 Settings -> Control Center 中加入 Screen Recording，这样从屏幕右上角下划时，会有屏幕录制按钮。
 
-<img width="360" alt="screen recording settings" src="https://github.com/everbird/geekdadgo/assets/142570/7eb414be-4b47-4227-aaea-ca0dcdd7138f">
-<img width="360" alt="screen recording button" src="https://github.com/everbird/geekdadgo/assets/142570/0e35fe86-920f-40e2-a2eb-36082c2d4f75">
+<img width="256" alt="screen recording settings" src="https://github.com/everbird/geekdadgo/assets/142570/7eb414be-4b47-4227-aaea-ca0dcdd7138f">
+<img width="256" alt="screen recording button" src="https://github.com/everbird/geekdadgo/assets/142570/0e35fe86-920f-40e2-a2eb-36082c2d4f75">
 
 打开 Procare 移动端 App，在 Activity 标签中点击宝宝名字右下方的漏斗图标，在 Activity Filter 页面，将默认的 "All Activities" 改为你想要保存的活动类型，例如 Note 或 Meals 等。再依次选择起始时间和结束时间后，点击 APPLY 按钮得到你所选择类别和时间范围的列表。注意 App 中时间范围目测一次最多选 85 天，所以推荐按月操作。
 
