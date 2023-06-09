@@ -63,7 +63,7 @@ geekdadgo --help
 2. 安装 [geek-dad-go_exporter.user.js](https://raw.githubusercontent.com/everbird/geekdadgo/main/geek-dad-go_exporter.user.js) userscript 脚本 (点击链接即可提示安装，或者自己手工安装：点击 Greasemonkey/Tampermonkey 按钮，选 “New user script ...“，将文件内容复制粘贴后保存 )
 3. 打开或刷新 Procare Web 页面，例如 [School Dashboard](https://schools.procareconnect.com/dashboard)
 4. 点击页面右下角新出现的 "Export photo/video links" 按钮
-5. 在弹出对话框中填写 起始时间 和 结束时间
+5. 在弹出对话框中分别填写 起始时间 和 结束时间，格式为 YYYY-MM-DD，例如 2023-07-12
 6. 等待生成并下载 csv 文件，你可以通过浏览器自带的 Web Developer Tools 在 Console 中查看进度
 
 ### Step 2. 使用索引 csv 文件下载照片/视频
@@ -102,6 +102,9 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 
 开始之前，先准备好屏幕录制功能。在 Settings -> Control Center 中加入 Screen Recording，这样从屏幕右上角下划时，会有屏幕录制按钮。
 
+![screen recording settings](https://github.com/everbird/geekdadgo/assets/142570/7eb414be-4b47-4227-aaea-ca0dcdd7138f)
+![screen record button](https://github.com/everbird/geekdadgo/assets/142570/0e35fe86-920f-40e2-a2eb-36082c2d4f75)
+
 打开 Procare 移动端 App，在 Activity 标签中点击宝宝名字右下方的漏斗图标，在 Activity Filter 页面，将默认的 "All Activities" 改为你想要保存的活动类型，例如 Note 或 Meals 等。再依次选择起始时间和结束时间后，点击 APPLY 按钮得到你所选择类别和时间范围的列表。注意 App 中时间范围目测一次最多选 85 天，所以推荐按月操作。
 
 开始录制之前，先将屏幕一直划到底部，让所有需要加载的新数据全都显示出来，直到看到底部"This is the end of your activities"。
@@ -116,7 +119,7 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 ``` bash
 geekdadgo run -o images -i procare-note-20230301-20230331.MP4 
 ```
-注意你可以用 -o 指定自己的输出目录，用 --config-path 指定自定义配置，用 -vvvv 开启更多日志。
+注意你可以用 `-o` 指定自己的输出目录，用 `--config-path` 指定自定义配置，用 `-vvvv` 开启更多日志。
 
 提取后请自行验收一遍图片，若出现严重遗漏、OCR偏差、缝合错位等，可以调整配置文件中的相应参数来适应你的情况
 
