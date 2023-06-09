@@ -29,6 +29,7 @@
 ## 如何安装？
 
 ``` bash
+# Dependencies of pytesseract and PyExifTool package used in python
 brew install tesseract exiftool
 
 ```
