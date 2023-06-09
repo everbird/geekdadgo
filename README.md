@@ -113,6 +113,10 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 
 尽量匀速上划，直到再次看到底部。然后点击左上角红色按钮结束录制。请保障所录制的内容不包含切换程序、加载、通知条等影响画面的元素，必要时可开启 Do Not Disturb 模式。
 
+附上例子视频仅供参考：
+
+https://github.com/everbird/geekdadgo/assets/142570/a18b2244-5cb9-40ed-8cbe-8e49fb979a47
+
 将录制好的 mp4 文件传输到电脑上(例如我直接用的 AirDrop)
 
 用以下命令将 mp4 文件按日提取成图片，放在 images 目录内：
@@ -120,6 +124,17 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 geekdadgo run -o images -i procare-note-20230301-20230331.MP4 
 ```
 注意你可以用 `-o` 指定自己的输出目录，用 `--config-path` 指定自定义配置，用 `-vvvv` 开启更多日志。
+
+从上述例子视频提取出的文件如下：
+<img width="528" alt="notes output" src="https://github.com/everbird/geekdadgo/assets/142570/619521de-60fc-432a-b109-c4ed45a4165b">
+
+附上具体图片：
+
+<img width="360" alt="img_procare-note-20221201-20221231_frame0065_s_2022-12-08T14-45-00" src="https://github.com/everbird/geekdadgo/assets/142570/29981910-79f7-4adc-ab5f-450cbdda2407">
+<img width="360" alt="img_procare-note-20221201-20221231_frame0198_n_2022-12-07T14-20-00" src="https://github.com/everbird/geekdadgo/assets/142570/96b940bc-b5c0-4952-ac1d-749383b2a7e1">
+<img width="360" alt="img_procare-note-20221201-20221231_frame0229_n_2022-12-06T19-40-00" src="https://github.com/everbird/geekdadgo/assets/142570/02db8839-aa00-4b90-a17d-b8197b18cf1f">
+<img width="360" alt="img_procare-note-20221201-20221231_frame0309_n_2022-12-05T20-22-00" src="https://github.com/everbird/geekdadgo/assets/142570/0b7ac8b8-7c02-46eb-bd33-98e3f9c265b0">
+<img width="360" alt="img_procare-note-20221201-20221231_frame0403_m0_2022-12-02T13-56-00" src="https://github.com/everbird/geekdadgo/assets/142570/1b0dcdd5-8ff7-4036-89ac-3ca664f17fde">
 
 提取后请自行验收一遍图片，若出现严重遗漏、OCR偏差、缝合错位等，可以调整配置文件中的相应参数来适应你的情况
 
