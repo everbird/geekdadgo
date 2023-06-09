@@ -131,11 +131,11 @@ geekdadgo run -o images -i procare-note-20230301-20230331.MP4
 
 附上具体图片：
 
-<img width="256" alt="img_procare-note-20221201-20221231_frame0065_s_2022-12-08T14-45-00" src="https://github.com/everbird/geekdadgo/assets/142570/29981910-79f7-4adc-ab5f-450cbdda2407">
-<img width="256" alt="img_procare-note-20221201-20221231_frame0198_n_2022-12-07T14-20-00" src="https://github.com/everbird/geekdadgo/assets/142570/96b940bc-b5c0-4952-ac1d-749383b2a7e1">
-<img width="256" alt="img_procare-note-20221201-20221231_frame0229_n_2022-12-06T19-40-00" src="https://github.com/everbird/geekdadgo/assets/142570/02db8839-aa00-4b90-a17d-b8197b18cf1f">
-<img width="256" alt="img_procare-note-20221201-20221231_frame0309_n_2022-12-05T20-22-00" src="https://github.com/everbird/geekdadgo/assets/142570/0b7ac8b8-7c02-46eb-bd33-98e3f9c265b0">
-<img width="256" alt="img_procare-note-20221201-20221231_frame0403_m0_2022-12-02T13-56-00" src="https://github.com/everbird/geekdadgo/assets/142570/1b0dcdd5-8ff7-4036-89ac-3ca664f17fde">
+<img width="384" alt="img_procare-note-20221201-20221231_frame0065_s_2022-12-08T14-45-00" src="https://github.com/everbird/geekdadgo/assets/142570/29981910-79f7-4adc-ab5f-450cbdda2407">
+<img width="384" alt="img_procare-note-20221201-20221231_frame0198_n_2022-12-07T14-20-00" src="https://github.com/everbird/geekdadgo/assets/142570/96b940bc-b5c0-4952-ac1d-749383b2a7e1">
+<img width="384" alt="img_procare-note-20221201-20221231_frame0229_n_2022-12-06T19-40-00" src="https://github.com/everbird/geekdadgo/assets/142570/02db8839-aa00-4b90-a17d-b8197b18cf1f">
+<img width="384" alt="img_procare-note-20221201-20221231_frame0309_n_2022-12-05T20-22-00" src="https://github.com/everbird/geekdadgo/assets/142570/0b7ac8b8-7c02-46eb-bd33-98e3f9c265b0">
+<img width="384" alt="img_procare-note-20221201-20221231_frame0403_m0_2022-12-02T13-56-00" src="https://github.com/everbird/geekdadgo/assets/142570/1b0dcdd5-8ff7-4036-89ac-3ca664f17fde">
 
 提取后请自行验收一遍图片，若出现严重遗漏、OCR偏差、缝合错位等，可以调整配置文件中的相应参数来适应你的情况
 
