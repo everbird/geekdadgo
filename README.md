@@ -116,7 +116,7 @@ geekdadgo update-dto -i ~/Downloads/procare/photos_2022-07-12_to_2023-05-24
 
 附上例子视频仅供参考：
 
-https://github.com/everbird/geekdadgo/assets/142570/a18b2244-5cb9-40ed-8cbe-8e49fb979a47
+https://github.com/everbird/geekdadgo/assets/142570/ebfb298d-bb39-4f96-9202-c51777bab13b
 
 将录制好的 mp4 文件传输到电脑上(例如我直接用的 AirDrop)
 
