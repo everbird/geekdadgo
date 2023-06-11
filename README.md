@@ -22,7 +22,7 @@
 
 - OCR 识别日期和时间，更新 [EXIF original date](https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif/datetimeoriginal.html) 信息(这样该照片在照片流按拍摄时间排序时，才会被放到对应那一天)
 
-- 按日将长图和多个图片缝合（stitch）成一张图片
+- 按日将长图和多个有部分重叠的图片缝合（stitch）成一张图片
 
 - 可通过更改 config 微调对 mp4 视频的分析细节(仅测试过 iPhone X Max，其他厂商或型号手机录制的 mp4 可能需要调整参数，例如调整 OCR 识别日期、时间的正确位置，提高识别准确率)
 
