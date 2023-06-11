@@ -47,7 +47,7 @@ pyenv activate geekdadgo-runtime
 python -m pip install --upgrade pip
 
 # Install geekdadgo
-pip install git+https://github.com/everbird/geekdadgo.git@v0.1.0
+pip install git+https://github.com/everbird/geekdadgo.git@v0.1.1
 
 # Download config file
 wget -O ~/.geekdadgo.conf https://raw.githubusercontent.com/everbird/geekdadgo/main/config/.geekdadgo.conf

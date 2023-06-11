@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="geekdadgo",
-    version="0.1.0",
+    version="0.1.1",
     author="everbird",
     author_email="stephen.zhuang@gmail.com",
     description="Assist parents in exporting their child's personal data from Procare, including photos, videos, notes, meals, and more.",
