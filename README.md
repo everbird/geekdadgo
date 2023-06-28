@@ -124,7 +124,7 @@ https://github.com/everbird/geekdadgo/assets/142570/ebfb298d-bb39-4f96-9202-c517
 ``` bash
 geekdadgo run -o images -i procare-note-20230301-20230331.MP4 
 ```
-注意你可以用 `-o` 指定自己的输出目录，用 `--config-path` 指定自定义配置，用 `-vvvv` 开启更多日志。
+注意你可以用 `-o` 指定自己的输出目录，用 `--config-path` 指定自定义配置，用 `-vvvv` 开启更多日志。另外配置文件 中 `[app]`部分的 `debug`设置为 `true` 可以开启调试模式，将处理过程中识别各个区域的结果按相应帧数输出成图片，以便按效果微调配置文件中的各个参数。
 
 从上述例子视频提取出的文件如下：
 
@@ -146,7 +146,7 @@ geekdadgo run -o images -i procare-note-20230301-20230331.MP4
 geekdadgo update-dto -i images
 ```
 
-如有必要，可以考虑用不同的配置文件，将同一个 mp4 文件的图片提取到不同目录，然后从中挑选出每日较好的那张。
+如有必要，可以考虑用不同的配置文件，将同一个 mp4 文件的图片提取到不同目录，然后从中挑选出每日较好的那张（主要是因为，如果图片很长的花，有时 stitch 会错乱，所以不同配置的输出结果有可能有好有坏）。
 
 
 
